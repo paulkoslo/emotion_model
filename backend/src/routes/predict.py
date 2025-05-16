@@ -87,7 +87,7 @@ def keras_model_predict(text_input):
     emotions_list = [
         'admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion', 'curiosity', 'desire', 
         'disappointment', 'disapproval', 'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief', 
-        'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise', 'neutral'
+        'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise'
     ]
     # Example (if raw_predictions is a 1D array/list of 28 probabilities):
     # predicted_probabilities = {emotion: float(prob) for emotion, prob in zip(emotions_list, raw_predictions[0])}
@@ -102,7 +102,7 @@ def keras_model_predict(text_input):
     elif "sad" in text_input.lower():
         probabilities['sadness'] = 0.6; probabilities['disappointment'] = 0.15; probabilities['grief'] = 0.1
     else:
-        probabilities['neutral'] = 0.5; probabilities['curiosity'] = 0.1
+        probabilities['curiosity'] = 0.5
     total_prob = sum(probabilities.values())
     if total_prob > 0: predicted_probabilities = {e: p/total_prob for e,p in probabilities.items()}
     else: predicted_probabilities = {e: 1/len(emotions_list) for e in emotions_list}
@@ -121,10 +121,10 @@ def map_emotion_to_sentiment(specific_emotion):
         'anger': 'Negative', 'annoyance': 'Negative', 'disappointment': 'Negative', 'disapproval': 'Negative',
         'disgust': 'Negative', 'embarrassment': 'Negative', 'fear': 'Negative', 'grief': 'Negative',
         'nervousness': 'Negative', 'remorse': 'Negative', 'sadness': 'Negative',
-        'confusion': 'Neutral', 'curiosity': 'Neutral', 'realization': 'Neutral', 'neutral': 'Neutral' 
+        'confusion': 'Neutral', 'curiosity': 'Neutral', 'realization': 'Neutral'
     }
     sentiment = sentiment_map.get(specific_emotion, 'Neutral')
-    logger.info(f"Mapped specific emotion \'{specific_emotion}\' to sentiment \'{sentiment}\"")
+    logger.info(f"Mapped specific emotion '{specific_emotion}' to sentiment '{sentiment}'")
     return sentiment
 
 @predict_bp.route("/api/predict", methods=["POST"])
@@ -235,7 +235,7 @@ TOKENIZER_PATH = os.path.join(os.path.dirname(__file__), "..", "ml_models", "tok
 EMOTIONS_LIST = [
     'admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion', 'curiosity', 'desire',
     'disappointment', 'disapproval', 'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief',
-    'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise', 'neutral'
+    'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise'
 ]
 
 try:
@@ -291,12 +291,6 @@ def keras_model_predict(text_input):
 
         # 3. Format Output:
         if raw_predictions is not None and len(raw_predictions) > 0:
-            # Ensure probabilities sum to 1 if they don't already (e.g. if model outputs logits)
-            # For softmax output, this might not be strictly necessary but good for consistency
-            # prediction_values = raw_predictions[0]
-            # if not np.isclose(np.sum(prediction_values), 1.0):
-            #     prediction_values = np.exp(prediction_values) / np.sum(np.exp(prediction_values)) # Softmax if logits
-            
             predicted_probabilities = {emotion: float(prob) for emotion, prob in zip(EMOTIONS_LIST, raw_predictions[0])}
         else:
             logger.error("Keras model returned empty or invalid predictions.")
@@ -318,7 +312,7 @@ def map_emotion_to_sentiment(specific_emotion):
         'anger': 'Negative', 'annoyance': 'Negative', 'disappointment': 'Negative', 'disapproval': 'Negative',
         'disgust': 'Negative', 'embarrassment': 'Negative', 'fear': 'Negative', 'grief': 'Negative',
         'nervousness': 'Negative', 'remorse': 'Negative', 'sadness': 'Negative',
-        'confusion': 'Neutral', 'curiosity': 'Neutral', 'realization': 'Neutral', 'neutral': 'Neutral'
+        'confusion': 'Neutral', 'curiosity': 'Neutral', 'realization': 'Neutral'
     }
     sentiment = sentiment_map.get(specific_emotion, 'Neutral')
     logger.info(f"Mapped specific emotion '{specific_emotion}' to sentiment '{sentiment}'")
